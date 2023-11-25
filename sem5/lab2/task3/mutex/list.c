@@ -86,6 +86,7 @@ int list_fill(list_t *l) {
 	int err;
 	for (int i = 0; i < l->max_count; ++i) {
 		int length = rand() % (MAX_STRING_SIZE-1) + 1;
+		//printf("len: %d\n", length);
 		char* new = (char *) malloc((length + 1) * sizeof(char));
 		if (!new) {
 			printf("list_fill: failed while malloc for string\n");
@@ -100,6 +101,7 @@ int list_fill(list_t *l) {
 			printf("list_fill: failed while add new node to list\n");
 			return 0;
 		}
+		//printf("str: %s\n", new);
 	}
     printf("list was filled!\n");
 	return 1;
@@ -108,6 +110,7 @@ int list_fill(list_t *l) {
 int lock_node(list_t *l, int index, node_t **node) {
 	pthread_mutex_t *current_mutex = NULL;
 	pthread_mutex_t *prev_mutex = NULL;
+	//pthread_mutex_t *next_mutex = NULL;
 
 	int err;
 	int cur_index = 0;
@@ -129,6 +132,32 @@ int lock_node(list_t *l, int index, node_t **node) {
 
 
 	while (cur_index < index) {
+		// if (current->next == NULL) {
+		// 	printf("find_node %d: failed while reading of list %d\n", gettid(), cur_index);
+		// 	exit(-1);
+		// }
+
+		// next_mutex = &current->next->sync;
+		// err = pthread_mutex_lock(next_mutex);
+		// if (err != 0) {
+		// 	printf("err\n");
+		// 	exit(-1);
+		// }
+
+		// if (prev_mutex != NULL) {
+		// 	err = pthread_mutex_unlock(prev_mutex);
+		// 	if (err != 0) {
+		// 		printf("err\n");
+		// 		exit(-1);
+		// 	}
+		// }
+
+		// prev_mutex = current_mutex;
+		// current_mutex = next_mutex;
+
+		// current = current->next;
+		// ++cur_index;
+
 
 		if (current->next == NULL) {
 			printf("find_node %d: failed while reading of list %d\n", gettid(), cur_index);
@@ -164,6 +193,14 @@ int lock_node(list_t *l, int index, node_t **node) {
 		}
 	}
 
+	// if (current_mutex != NULL) {
+	// 	err = pthread_mutex_unlock(current_mutex);
+	// 	if (err != 0) {
+	// 		printf("err\n");
+	// 		exit(-1);
+	// 	}
+	// }
+
 	*node = current;
 	return 1;
 }
@@ -186,6 +223,7 @@ int list_get(list_t *l, int index, node_t **val) {
 	int cur_index = 0;
 	pthread_mutex_t *current_mutex = NULL;
 	pthread_mutex_t *prev_mutex = NULL;
+	//pthread_mutex_t *next_mutex = NULL;
 
 	prev_mutex = &l->list_sync;
 	err = pthread_mutex_lock(prev_mutex);
@@ -204,6 +242,40 @@ int list_get(list_t *l, int index, node_t **val) {
 	}
 
 	while (cur_index < index) {
+		// if (current == NULL) {
+		// 	printf("print_list: failed while reading of list\n");
+		// 	break;
+		// }
+		// printf("list[%d]: %s\n", cur_index, current->string);
+
+
+		// if (current->next == NULL) {
+		// 	printf("find_node %d: failed while reading of list %d\n", gettid(), cur_index);
+		// 	abort();
+		// }
+
+		// next_mutex = &current->next->sync;
+		// err = pthread_mutex_lock(next_mutex);
+		// if (err != 0) {
+		// 	printf("err\n");
+		// 	exit(-1);
+		// }
+
+
+		// if (prev_mutex != NULL) {
+		// 	err = pthread_mutex_unlock(prev_mutex);
+		// 	if (err != 0) {
+		// 		printf("err\n");
+		// 		exit(-1);
+		// 	}
+		// }
+
+		// prev_mutex = current_mutex;
+		// current_mutex = next_mutex;
+
+		// current = current->next;
+		// ++cur_index;
+
 		if (current == NULL) {
 			printf("print_list: failed while getting the node of list\n");
 			break;
@@ -269,7 +341,7 @@ void print_list(list_t *l) {
 	int count = l->count;
 	pthread_mutex_t *current_mutex = NULL;
 	pthread_mutex_t *prev_mutex = NULL;
-
+	//pthread_mutex_t *next_mutex = NULL;
 
 	prev_mutex = &l->list_sync;
 	err = pthread_mutex_lock(prev_mutex);
@@ -288,7 +360,40 @@ void print_list(list_t *l) {
 	}
 
 	while (cur_index < (count-1)) {
-		
+		// if (current == NULL) {
+		// 	printf("print_list: failed while reading of list\n");
+		// 	break;
+		// }
+		// printf("list[%d]: %s\n", cur_index, current->string);
+
+
+		// if (current->next == NULL) {
+		// 	printf("find_node %d: failed while reading of list %d\n", gettid(), cur_index);
+		// 	abort();
+		// }
+
+		// next_mutex = &current->next->sync;
+		// err = pthread_mutex_lock(next_mutex);
+		// if (err != 0) {
+		// 	printf("err\n");
+		// 	exit(-1);
+		// }
+
+
+		// if (prev_mutex != NULL) {
+		// 	err = pthread_mutex_unlock(prev_mutex);
+		// 	if (err != 0) {
+		// 		printf("err\n");
+		// 		exit(-1);
+		// 	}
+		// }
+
+		// prev_mutex = current_mutex;
+		// current_mutex = next_mutex;
+
+		// current = current->next;
+		// ++cur_index;
+
 		if (current == NULL) {
 			printf("print_list: failed while reading of list\n");
 			break;
@@ -367,6 +472,11 @@ int swap(list_t *l, int index) {
 			exit(-1);
 		}
 		mutex_prev = &node_prev->sync;
+		// err = pthread_mutex_lock(mutex_prev);
+		// if (err != 0) {
+		// 	printf("err\n");
+		// 	exit(-1);
+		// }
 	} else {
 		mutex_list = &l->list_sync;
 		err = pthread_mutex_lock(mutex_list);

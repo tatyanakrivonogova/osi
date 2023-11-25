@@ -26,6 +26,7 @@ void *lmonitor(void *arg) {
 	printf("lmonitor: [%d %d %d]\n", getpid(), getppid(), gettid());
 
 	while (1) {
+		//printf("lmonitor: swap counter = %d		reader greater counter = %d		reader less counter = %d\n", swap_counter, reader_greater_counter, reader_less_counter);
 		printf("lmonitor: swap counter = %d		reader greater counter = %d		reader less counter = %d		reader equal counter = %d\n", swap_counter, reader_greater_counter, reader_less_counter, reader_equal_counter);
 		sleep(1);
 	}
@@ -33,12 +34,32 @@ void *lmonitor(void *arg) {
 	return NULL;
 }
 
+// void set_cpu(int n) {
+// 	int err;
+// 	cpu_set_t cpuset;
+// 	pthread_t tid = pthread_self();
+
+// 	CPU_ZERO(&cpuset);
+// 	CPU_SET(n, &cpuset);
+
+// 	err = pthread_setaffinity_np(tid, sizeof(cpu_set_t), &cpuset);
+// 	if (err) {
+// 		printf("set_cpu: pthread_setaffinity failed for cpu %d\n", n);
+// 		return;
+// 	}
+
+// 	printf("set_cpu: set cpu %d\n", n);
+// }
+
+
 
 void *reader_greater(void *arg) {
 	int err;
 	int counter = 0;
 	list_t *l = (list_t *)arg;
 	printf("reader [%d %d %d]\n", getpid(), getppid(), gettid());
+
+	//set_cpu(1);
 
 	node_t *current_node;
 	while (1) {
@@ -70,6 +91,8 @@ void *reader_less(void *arg) {
 	list_t *l = (list_t *)arg;
 	printf("reader [%d %d %d]\n", getpid(), getppid(), gettid());
 
+	//set_cpu(1);
+
 	node_t *current_node;
 	while (1) {
 		counter = 0;
@@ -100,6 +123,8 @@ void *reader_equal(void *arg) {
 	list_t *l = (list_t *)arg;
 	printf("reader [%d %d %d]\n", getpid(), getppid(), gettid());
 
+	//set_cpu(1);
+
 	node_t *current_node;
 	while (1) {
 		counter = 0;
@@ -128,6 +153,8 @@ void *swapper(void *arg) {
 	int err;
 	list_t *l = (list_t *) arg;
 	printf("swapper [%d %d %d]\n", getpid(), getppid(), gettid());
+
+	//set_cpu(2);
 
 	while (1) {
 		for (int i = 0; i < l->count - 1; ++i) {
